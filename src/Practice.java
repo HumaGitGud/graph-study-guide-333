@@ -99,9 +99,28 @@ public class Practice {
    * @return a sorted list of all reachable vertex values
    */
   public static List<Integer> sortedReachable(Map<Integer, Set<Integer>> graph, int starting) {
-    return null;
+    Set<Integer> visited = new HashSet<>();
+    List<Integer> list = new ArrayList<>();
+    sortedReachable(graph, starting, visited, list);
+    Collections.sort(list);
+    return list;
   }
+  
+  public static List<Integer> sortedReachable(Map<Integer, Set<Integer>> graph, int starting, Set<Integer> visited, List<Integer> list) {
+    if (graph == null) return list;
+    if (!graph.containsKey(starting)) return list;
+    if (visited.contains(starting)) return list;
 
+    visited.add(starting);
+    list.add(starting);
+
+    for (int neighbor : graph.get(starting)) {
+      sortedReachable(graph, neighbor, visited, list);
+    }
+
+    return list;
+  }
+  
   /**
    * Returns true if and only if it is possible both to reach v2 from v1 and to reach v1 from v2.
    * A vertex is always considered reachable from itself.
@@ -117,6 +136,26 @@ public class Practice {
    * @return true if there is a two-way connection between v1 and v2, false otherwise
    */
   public static <T> boolean twoWay(Vertex<T> v1, Vertex<T> v2) {
+    if (v1 == null || v2 == null) return false;
+    if (v1 == v2) return true;
+
+    Set<Vertex<T>> visitedFromV1 = new HashSet<>();
+    Set<Vertex<T>> visitedFromV2 = new HashSet<>();
+
+    return twoWay(v1, v2, visitedFromV1) && twoWay(v2, v1, visitedFromV2);
+  }
+  
+  private static <T> boolean twoWay(Vertex<T> start, Vertex<T> target, Set<Vertex<T>> visited) {
+    if (start == null) return false;
+    if (start == target) return true;
+    if (visited.contains(start)) return false;
+
+    visited.add(start);
+
+    for (Vertex<T> neighbor : start.neighbors) {
+      if (twoWay(neighbor, target, visited)) return true;
+    }
+    
     return false;
   }
 
