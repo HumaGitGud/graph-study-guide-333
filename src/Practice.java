@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +28,24 @@ public class Practice {
    * @return the number of vertices with odd values reachable from the starting vertex
    */
   public static int oddVertices(Vertex<Integer> starting) {
-    return 0;
+    Set<Vertex<Integer>> visited = new HashSet<>();
+    return oddVertices(starting, visited);
+  }
+
+  private static int oddVertices(Vertex<Integer> starting, Set<Vertex<Integer>> visited) {
+    if (starting == null || visited.contains(starting)) return 0;
+
+    visited.add(starting);
+
+    int count = 0;
+    
+    if (starting.data % 2 != 0) count++;
+
+    for (Vertex<Integer> neighbor : starting.neighbors) {
+      count += oddVertices(neighbor, visited);
+    }
+
+    return count;
   }
 
   /**
@@ -47,8 +67,25 @@ public class Practice {
    * @return a sorted list of all reachable vertex values by 
    */
   public static List<Integer> sortedReachable(Vertex<Integer> starting) {
-    // Unimplemented: perform a depth-first search and sort the collected values.
-    return null;
+    Set<Vertex<Integer>> visited = new HashSet<>();
+    List<Integer> list = new ArrayList<>();
+    sortedReachable(starting, visited, list);
+    Collections.sort(list);
+    return list;
+  }
+  
+  private static List<Integer> sortedReachable(Vertex<Integer> starting, Set<Vertex<Integer>> visited, List<Integer> list) {
+    if (starting == null || visited.contains(starting)) return list;
+
+    visited.add(starting);
+
+    list.add(starting.data);
+
+    for (Vertex<Integer> neighbor: starting.neighbors) {
+      sortedReachable(neighbor, visited, list);
+    }
+
+    return list;
   }
 
   /**
