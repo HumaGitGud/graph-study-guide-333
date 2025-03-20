@@ -31,14 +31,13 @@ public class Practice {
     Set<Vertex<Integer>> visited = new HashSet<>();
     return oddVertices(starting, visited);
   }
-
+  
   private static int oddVertices(Vertex<Integer> starting, Set<Vertex<Integer>> visited) {
     if (starting == null || visited.contains(starting)) return 0;
 
     visited.add(starting);
-
     int count = 0;
-    
+
     if (starting.data % 2 != 0) count++;
 
     for (Vertex<Integer> neighbor : starting.neighbors) {
@@ -66,6 +65,17 @@ public class Practice {
    * @param starting the starting vertex (may be null)
    * @return a sorted list of all reachable vertex values by 
    */
+
+  /*
+   Create a visited hashset
+   Create a list to store values
+   Create a helper method
+   Create base cases
+   Add vertex to visited each time to avoid cycles
+   Add vertex.data to a list
+   Create foreach loop
+    recurse
+   */
   public static List<Integer> sortedReachable(Vertex<Integer> starting) {
     Set<Vertex<Integer>> visited = new HashSet<>();
     List<Integer> list = new ArrayList<>();
@@ -76,12 +86,11 @@ public class Practice {
   
   private static List<Integer> sortedReachable(Vertex<Integer> starting, Set<Vertex<Integer>> visited, List<Integer> list) {
     if (starting == null || visited.contains(starting)) return list;
-
+    
     visited.add(starting);
-
     list.add(starting.data);
 
-    for (Vertex<Integer> neighbor: starting.neighbors) {
+    for (Vertex<Integer> neighbor : starting.neighbors) {
       sortedReachable(neighbor, visited, list);
     }
 
@@ -105,16 +114,16 @@ public class Practice {
     Collections.sort(list);
     return list;
   }
+
   
-  public static List<Integer> sortedReachable(Map<Integer, Set<Integer>> graph, int starting, Set<Integer> visited, List<Integer> list) {
-    if (graph == null) return list;
-    if (!graph.containsKey(starting)) return list;
-    if (visited.contains(starting)) return list;
+  private static List<Integer> sortedReachable(Map<Integer, Set<Integer>> graph, int starting, Set<Integer> visited, List<Integer> list) {
+    if (graph == null || !graph.containsKey(starting)) return list;
+    if (starting < 0 || visited.contains(starting)) return list;
 
     visited.add(starting);
     list.add(starting);
 
-    for (int neighbor : graph.get(starting)) {
+    for (Integer neighbor : graph.get(starting)) {
       sortedReachable(graph, neighbor, visited, list);
     }
 
@@ -135,27 +144,31 @@ public class Practice {
    * @param v2 the target vertex
    * @return true if there is a two-way connection between v1 and v2, false otherwise
    */
+
+  // Same traversal method, just need to check if you can reach target
+  // then, call 2 methods changing the order of vertices and comparing them
   public static <T> boolean twoWay(Vertex<T> v1, Vertex<T> v2) {
-    if (v1 == null || v2 == null) return false;
-    if (v1 == v2) return true;
+    Set<Vertex<T>> visitedV1 = new HashSet<>();
+    Set<Vertex<T>> visitedV2 = new HashSet<>();
 
-    Set<Vertex<T>> visitedFromV1 = new HashSet<>();
-    Set<Vertex<T>> visitedFromV2 = new HashSet<>();
-
-    return twoWay(v1, v2, visitedFromV1) && twoWay(v2, v1, visitedFromV2);
+    return twoWay(v1, v2, visitedV1) && twoWay(v2, v1, visitedV2);
   }
   
-  private static <T> boolean twoWay(Vertex<T> start, Vertex<T> target, Set<Vertex<T>> visited) {
-    if (start == null) return false;
-    if (start == target) return true;
+  public static <T> boolean twoWay(Vertex<T> start, Vertex<T> end, Set<Vertex<T>> visited) {
+    // stop immediately if they're null
+    if (start == null || end == null) return false;
+    // target base case, if true = success
+    if (start == end) return true;
     if (visited.contains(start)) return false;
 
     visited.add(start);
 
     for (Vertex<T> neighbor : start.neighbors) {
-      if (twoWay(neighbor, target, visited)) return true;
+      // recurse for each neighbor checking if if (start == end) return true;
+      // if target base case returns true, method returns true ---> if(true) return true;
+      if(twoWay(neighbor, end, visited)) return true;
     }
-    
+
     return false;
   }
 
@@ -175,23 +188,22 @@ public class Practice {
     Set<Integer> visited = new HashSet<>();
     return positivePathExists(graph, starting, ending, visited);
   }
-
+  
   private static boolean positivePathExists(Map<Integer, Set<Integer>> graph, int starting, int ending, Set<Integer> visited) {
-    if (graph == null) return false;
-    if (!graph.containsKey(starting)) return false;
-    if (!graph.containsKey(ending)) return false;
-    if (visited.contains(starting)) return false;
-    if (starting < 0 || ending < 0) return false;
     if (starting == ending) return true;
+
+    if (graph == null || !graph.containsKey(starting)) return false;
+    if (starting < 0 || ending < 0) return false;
+    if (visited.contains(starting)) return false;
 
     visited.add(starting);
 
-    for (int neighbor : graph.get(starting)) {
-      if (neighbor > 0 && !visited.contains(neighbor)) {
-        if (positivePathExists(graph, neighbor, ending, visited)) return true;
+    for (Integer neighbor : graph.get(starting)) {
+      if (neighbor > 0) {
+        if(positivePathExists(graph, neighbor, ending, visited)) return true;
       }
     }
-    
+
     return false;
   }
 
@@ -212,17 +224,14 @@ public class Practice {
   private static boolean hasExtendedConnectionAtCompany(Professional person, String companyName, Set<Professional> visited) {
     if (person == null || companyName == null) return false;
     if (visited.contains(person)) return false;
-    
+    if (person.getCompany().equals(companyName)) return true;
+
     visited.add(person);
 
-    if (person.getCompany().equals(companyName)) {
-      return true;
+    for (Professional neighbor : person.getConnections()) {
+      if (hasExtendedConnectionAtCompany(neighbor, companyName, visited)) return true;
     }
 
-    for (Professional professional : person.getConnections()) {
-      if (hasExtendedConnectionAtCompany(professional, companyName, visited)) return true;
-    }
-    
     return false;
   }
 }
